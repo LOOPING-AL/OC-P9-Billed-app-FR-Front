@@ -13,7 +13,6 @@ import BillsClass from "../containers/Bills.js";
 import userEvent from "@testing-library/user-event";
 import router from "../app/Router.js";
 
-
 jest.mock("../app/Store", () => mockStore);
 
 const billsData = [
@@ -50,14 +49,18 @@ describe("Given I am connected as an employee", () => {
       const root = document.createElement("div");
       root.setAttribute("id", "root");
       document.body.append(root);
+
       router();
+
       window.onNavigate(ROUTES_PATH.Bills);
       await waitFor(() => screen.getByTestId("icon-window"));
       const windowIcon = screen.getByTestId("icon-window");
+
       expect(windowIcon.classList).toContain("active-icon");
     });
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills });
+
       const dates = screen
         .getAllByText(
           /^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i
@@ -65,8 +68,10 @@ describe("Given I am connected as an employee", () => {
         .map((a) => a.innerHTML);
       const antiChrono = (a, b) => (a < b ? 1 : -1);
       const datesSorted = [...dates].sort(antiChrono);
+
       expect(dates).toEqual(datesSorted);
     });
+
     test("Then eye icon is click, modal open", () => {
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
@@ -106,7 +111,7 @@ describe("Given I am connected as an employee", () => {
 // test d'intégration GET
 describe("Given I am a user connected as Employee", () => {
   describe("When I navigate to Bills", () => {
-    test("fetches bills from mock API GET", async () => {
+    test("Then fetches bills from mock API GET", async () => {
       localStorage.setItem(
         "user",
         JSON.stringify({ type: "Employee", email: "a@a" })
@@ -115,12 +120,16 @@ describe("Given I am a user connected as Employee", () => {
       root.setAttribute("id", "root");
       document.body.append(root);
       router();
+
       window.onNavigate(ROUTES_PATH.Bills);
       await waitFor(() => screen.getByText("Mes notes de frais"));
+
       const contentHotel = await screen.getByText("Hôtel et logement");
       expect(contentHotel).toBeTruthy();
+
       const contentTransports = await screen.getByText("Transports");
       expect(contentTransports).toBeTruthy();
+
       expect(screen.getAllByTestId("icon-eye").length).toEqual(5);
     });
     describe("When an error occurs on API", () => {
@@ -141,7 +150,8 @@ describe("Given I am a user connected as Employee", () => {
         document.body.appendChild(root);
         router();
       });
-      test("fetches bills from an API and fails with 404 message error", async () => {
+
+      test("Then fetches bills from an API and fails with 404 message error", async () => {
         mockStore.bills.mockImplementationOnce(() => {
           return {
             list: () => {
@@ -151,11 +161,13 @@ describe("Given I am a user connected as Employee", () => {
         });
         window.onNavigate(ROUTES_PATH.Bills);
         await new Promise(process.nextTick);
+
         const message = await screen.getByText(/Erreur 404/);
+
         expect(message).toBeTruthy();
       });
 
-      test("fetches messages from an API and fails with 500 message error", async () => {
+      test("Then fetches messages from an API and fails with 500 message error", async () => {
         mockStore.bills.mockImplementationOnce(() => {
           return {
             list: () => {
@@ -166,7 +178,9 @@ describe("Given I am a user connected as Employee", () => {
 
         window.onNavigate(ROUTES_PATH.Bills);
         await new Promise(process.nextTick);
+
         const message = await screen.getByText(/Erreur 500/);
+
         expect(message).toBeTruthy();
       });
     });
