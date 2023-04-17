@@ -70,41 +70,38 @@ export default class Login {
 
   // not need to cover this function by tests
   login = (user) => {
-    if (this.store) {
-      return this.store
-        .login(
-          JSON.stringify({
-            email: user.email,
-            password: user.password,
-          })
-        )
-        .then(({ jwt }) => {
-          localStorage.setItem("jwt", jwt);
-        });
-    } else {
-      return null;
+    {
+      this.store
+        ? this.store
+            .login(
+              JSON.stringify({
+                email: user.email,
+                password: user.password,
+              })
+            )
+            .then(({ jwt }) => {
+              localStorage.setItem("jwt", jwt);
+            })
+        : null;
     }
   };
 
   // not need to cover this function by tests
   createUser = (user) => {
-    if (this.store) {
-      return this.store
-        .users()
-        .create({
-          data: JSON.stringify({
-            type: user.type,
-            name: user.email.split("@")[0],
-            email: user.email,
-            password: user.password,
-          }),
-        })
-        .then(() => {
-          console.log(`User with ${user.email} is created`);
-          return this.login(user);
-        });
-    } else {
-      return null;
-    }
+    this.store
+      ? this.store
+          .users()
+          .create({
+            data: JSON.stringify({
+              type: user.type,
+              name: user.email.split("@")[0],
+              email: user.email,
+              password: user.password,
+            }),
+          })
+          .then(() => {
+            return this.login(user);
+          })
+      : null;
   };
 }
